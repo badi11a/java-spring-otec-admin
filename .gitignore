@@ -1,0 +1,13 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# VS Code
+.vscode/
+.history/
+*.code-workspace
+
+# Sistema
+bin/
+*.log
+.DS_Store

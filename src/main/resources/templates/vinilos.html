@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Club de Vinilos</title>
+</head>
+<body>
+    <h1>Catálogo de Vinilos</h1>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Artista</th>
+                <th>Año</th>
+                <th>Género</th>
+                <th>Disponible</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="vinilo : ${vinilos}">
+                <td th:text="${vinilo.idVinilo}"></td>
+                <td th:text="${vinilo.titulo}"></td>
+                <td th:text="${vinilo.artista}"></td>
+                <td th:text="${vinilo.anioLanzamiento}"></td>
+                <td th:text="${vinilo.genero}"></td>
+                <td th:text="${vinilo.disponible ? 'Sí' : 'No'}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
