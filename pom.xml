@@ -8,10 +8,10 @@
 		<version>4.0.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>cl.talento.vinilo</groupId>
-	<artifactId>demo</artifactId>
+	<groupId>cl.talento.otec</groupId>
+	<artifactId>admin</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
+	<name>otec-admin</name>
 	<description/>
 	<url/>
 	<licenses>

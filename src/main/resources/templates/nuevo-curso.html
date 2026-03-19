@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Nuevo Curso - OTEC</title>
+</head>
+<body>
+    <h1>Crear Nuevo Curso</h1>
+    
+    <form th:action="@{/cursos}" th:object="${curso}" method="POST">
+        <input type="hidden" id="idCurso" th:field="*{idCurso}" />
+        
+        <div>
+            <label for="canal">Canal:</label>
+            <input type="text" id="canal" th:field="*{canal}" />
+        </div>
+        
+        <div>
+            <label for="codigo">Código:</label>
+            <input type="text" id="codigo" th:field="*{codigo}" />
+        </div>
+        
+        <div>
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" th:field="*{nombre}" required />
+        </div>
+        
+        <div>
+            <label for="instructor">Instructor:</label>
+            <input type="text" id="instructor" th:field="*{instructor}" required />
+        </div>
+        
+        <div>
+            <label for="duracionHoras">Duración (Horas):</label>
+            <input type="number" id="duracionHoras" th:field="*{duracionHoras}" required />
+        </div>
+        
+        <div>
+            <label for="categoria">Categoría:</label>
+            <input type="text" id="categoria" th:field="*{categoria}" required />
+        </div>
+        
+        <div>
+            <label for="activo">Activo:</label>
+            <input type="checkbox" id="activo" th:field="*{activo}" />
+        </div>
+        
+        <div>
+            <button type="submit">Guardar Curso</button>
+            <a th:href="@{/cursos}">Cancelar</a>
+        </div>
+    </form>
+</body>
+</html>

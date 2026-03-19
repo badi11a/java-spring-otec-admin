@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Cursos OTEC</title>
+</head>
+<body>
+    <h1>Catálogo de Cursos</h1>
+    
+    <div>
+        <a th:href="@{/cursos/nuevo}">Crear Nuevo Curso</a>
+    </div>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Canal</th>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Instructor</th>
+                <th>Duración (Horas)</th>
+                <th>Categoría</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="c : ${cursos}">
+                <td th:text="${c.idCurso}"></td>
+                <td th:text="${c.canal}"></td>
+                <td th:text="${c.codigo}"></td>
+                <td th:text="${c.nombre}"></td>
+                <td th:text="${c.instructor}"></td>
+                <td th:text="${c.duracionHoras}"></td>
+                <td th:text="${c.categoria}"></td>
+                <td th:text="${c.activo ? 'Sí' : 'No'}"></td>
+                <td>
+                    <a th:href="@{/cursos/editar/{id}(id=${c.idCurso})}">Editar</a>
+                    |
+                    <a th:href="@{/cursos/eliminar/{id}(id=${c.idCurso})}" onclick="return confirm('¿Eliminar este curso?')">Eliminar</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
