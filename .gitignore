@@ -11,3 +11,5 @@ target/
 bin/
 *.log
 .DS_Store
+
+src/main/resources/application.properties
