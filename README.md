@@ -1,26 +1,29 @@
 # Sistema de Gestión de Cursos - OTEC Admin
 
-Este proyecto es un mantenedor CRUD funcional desarrollado en **Spring Boot**, diseñado para la administración de la malla de cursos y **secciones** de un Organismo Técnico de Capacitación (OTEC), como los dictados para Talento Digital. Sirve como una base educativa que implementa estándares de la industria como arquitectura de capas y el uso estricto del patrón **DTO**.
+Este proyecto es un mantenedor CRUD funcional desarrollado en **Spring Boot**, diseñado para la administración de la malla de cursos y **secciones** de un Organismo Técnico de Capacitación (OTEC), como los dictados para Talento Digital. Implementa estándares de la industria como arquitectura de capas, el uso estricto del patrón **DTO** y prácticas modernas de **Spring Security 6**.
 
 ## 🚀 Características Principales
 
 * **CRUD Básico Completo:** Capacidad para listar, crear, editar y eliminar (físicamente) cursos y secciones de la base de datos.
+* **Seguridad Base (Prueba de Concepto):** Protección de rutas (`/cursos/**`) mediante Spring Security 6 utilizando autenticación en memoria y encriptación BCrypt, sin uso de herencia obsoleta (`WebSecurityConfigurerAdapter`).
 * **Separación de Responsabilidades:** Código estructurado para diferenciar claramente la lógica de acceso a datos, las reglas de negocio y la presentación web.
 
 ## 🏗️ Arquitectura del Proyecto
 
-El proyecto sigue un riguroso patrón de **3 Capas** para asegurar la escalabilidad y facilitar la enseñanza:
+El proyecto sigue un riguroso patrón de **3 Capas** para asegurar la escalabilidad:
 
 1. **Modelo (Entity):** Representación de la tabla `cursos` en MariaDB mediante JPA.
 2. **Repositorio:** Interfaz que extiende de `JpaRepository` para operaciones de persistencia automatizadas.
 3. **Servicio:** Capa de lógica de negocio donde se realiza el mapeo bidireccional de Entidades a DTOs.
 4. **Controlador:** Maneja las peticiones HTTP y devuelve las vistas web renderizadas.
 5. **DTO (Data Transfer Object):** Objetos de transferencia para aislar la base de datos y exponer solo los datos necesarios a la vista.
+6. **Configuración de Seguridad:** Uso de `SecurityFilterChain` para la gestión de filtros HTTP y autorización basada en componentes.
 
 ## 🛠️ Tecnologías Utilizadas
 
 * **Java 17+**
-* **Spring Boot 3.x** (Web, Data JPA)
+* **Spring Boot 3.x** (Web, Data JPA, Security)
+* **Spring Security 6**
 * **Thymeleaf** (Motor de plantillas)
 * **MariaDB** (Base de datos relacional)
 * **Maven** (Gestión de dependencias)
