@@ -14,10 +14,13 @@ public class Curso {
     private String canal;
     private String codigo;
     private String nombre;
-    private String instructor;
     
     @Column(name = "duracion_horas")
     private Integer duracionHoras;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_relator")
+    private Relator relator;
     
     private String categoria;
     private Boolean activo = true;
@@ -36,9 +39,6 @@ public class Curso {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public String getInstructor() { return instructor; }
-    public void setInstructor(String instructor) { this.instructor = instructor; }
-
     public Integer getDuracionHoras() { return duracionHoras; }
     public void setDuracionHoras(Integer duracionHoras) { this.duracionHoras = duracionHoras; }
 
@@ -47,4 +47,7 @@ public class Curso {
 
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+
+    public Relator getRelator() { return relator; }
+    public void setRelator(Relator relator) { this.relator = relator; }
 }

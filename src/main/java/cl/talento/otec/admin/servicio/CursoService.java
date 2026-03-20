@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 
 import cl.talento.otec.admin.dto.CursoDTO;
 import cl.talento.otec.admin.modelo.Curso;
+import cl.talento.otec.admin.modelo.Relator;
 import cl.talento.otec.admin.repositorio.CursoRepository;
+import cl.talento.otec.admin.repositorio.RelatorRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,62 +15,111 @@ import java.util.Optional;
 public class CursoService {
 
     private final CursoRepository cursoRepository;
+    private final RelatorRepository relatorRepository;
 
-    public CursoService(CursoRepository cursoRepository) {
+    public CursoService(CursoRepository cursoRepository, RelatorRepository relatorRepository) {
         this.cursoRepository = cursoRepository;
+        this.relatorRepository = relatorRepository;
     }
 
     public List<CursoDTO> obtenerTodosCursos() {
-        return cursoRepository.findAll().stream()
-                .map(c -> new CursoDTO(
-                        c.getIdCurso(),
-                        c.getCanal(),
-                        c.getCodigo(),
-                        c.getNombre(),
-                        c.getInstructor(),
-                        c.getDuracionHoras(),
-                        c.getCategoria(),
-                        c.getActivo()
-                ))
+        return cursoRepository.findByActivoTrue().stream()
+                .map(this::mapCursoToDTO)
                 .toList();
+    }
+    
+    private CursoDTO mapCursoToDTO(Curso curso) {
+        if (curso == null) {
+            return null;
+        }
+        
+        String nombreRelator = "Sin Relator Asignado";
+        Integer idRelator = null;
+        
+        try {
+            Relator relator = curso.getRelator();
+            if (relator != null) {
+                idRelator = relator.getIdRelator();
+                String nombres = relator.getNombres() != null ? relator.getNombres().trim() : "";
+                String apellidos = relator.getApellidos() != null ? relator.getApellidos().trim() : "";
+                String nombreCompleto = (nombres + " " + apellidos).trim();
+                if (!nombreCompleto.isEmpty()) {
+                    nombreRelator = nombreCompleto;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al mapear relator: " + e.getMessage());
+            nombreRelator = "Sin Relator Asignado";
+        }
+        
+        return new CursoDTO(
+                curso.getIdCurso(),
+                curso.getCanal(),
+                curso.getCodigo(),
+                curso.getNombre(),
+                idRelator,
+                nombreRelator,
+                curso.getDuracionHoras(),
+                curso.getCategoria(),
+                curso.getActivo()
+        );
     }
 
     public void guardarCurso(CursoDTO cursoDTO) {
+        if (cursoDTO == null) {
+            throw new IllegalArgumentException("CursoDTO no puede ser nulo");
+        }
+        
         Curso curso;
+        
         if (cursoDTO.getIdCurso() != null) {
-            // Actualizar curso existente
-            Optional<Curso> cursoExistente = cursoRepository.findById(cursoDTO.getIdCurso());
-            curso = cursoExistente.orElse(new Curso());
+            Optional<Curso> existente = cursoRepository.findById(cursoDTO.getIdCurso());
+            if (!existente.isPresent()) {
+                throw new IllegalArgumentException("Curso no encontrado");
+            }
+            curso = existente.get();
         } else {
-            // Crear nuevo curso
             curso = new Curso();
         }
-        curso.setCanal(cursoDTO.getCanal());
+        
+        curso.setCanal(cursoDTO.getCanal() != null ? cursoDTO.getCanal() : "");
         curso.setCodigo(cursoDTO.getCodigo());
         curso.setNombre(cursoDTO.getNombre());
-        curso.setInstructor(cursoDTO.getInstructor());
         curso.setDuracionHoras(cursoDTO.getDuracionHoras());
-        curso.setCategoria(cursoDTO.getCategoria());
-        curso.setActivo(cursoDTO.getActivo());
+        curso.setCategoria(cursoDTO.getCategoria() != null ? cursoDTO.getCategoria() : "");
+        curso.setActivo(cursoDTO.getActivo() != null ? cursoDTO.getActivo() : true);
+        
+        if (cursoDTO.getIdRelator() != null) {
+            Optional<Relator> relator = relatorRepository.findById(cursoDTO.getIdRelator());
+            if (relator.isPresent()) {
+                curso.setRelator(relator.get());
+            } else {
+                throw new IllegalArgumentException("Relator no encontrado");
+            }
+        } else {
+            curso.setRelator(null);
+        }
+        
         cursoRepository.save(curso);
     }
 
     public CursoDTO obtenerCursoPorId(Integer id) {
+        if (id == null) {
+            return null;
+        }
         Optional<Curso> curso = cursoRepository.findById(id);
-        return curso.map(c -> new CursoDTO(
-                c.getIdCurso(),
-                c.getCanal(),
-                c.getCodigo(),
-                c.getNombre(),
-                c.getInstructor(),
-                c.getDuracionHoras(),
-                c.getCategoria(),
-                c.getActivo()
-        )).orElse(null);
+        return curso.map(this::mapCursoToDTO).orElse(null);
     }
 
     public void eliminarCurso(Integer id) {
-        cursoRepository.deleteById(id);
+        if (id != null) {
+            Optional<Curso> curso = cursoRepository.findById(id);
+            if (curso.isPresent()) {
+                Curso cursoAEliminar = curso.get();
+                cursoAEliminar.setActivo(false);
+                cursoRepository.save(cursoAEliminar);
+            }
+        }
     }
 }
 

@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import cl.talento.otec.admin.modelo.Usuario;
 import cl.talento.otec.admin.repositorio.UsuarioRepository;
 
-import java.util.Collections;
-
 @Service
 public class JpaUserDetailsService implements UserDetailsService {
 

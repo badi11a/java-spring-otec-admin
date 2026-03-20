@@ -7,37 +7,58 @@
 <body>
     <h1>Crear Nuevo Curso</h1>
     
+    <div th:if="${error}" style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
+        <h3>Error:</h3>
+        <p th:text="${error}"></p>
+    </div>
+    
     <form th:action="@{/cursos}" th:object="${curso}" method="POST">
+        <div th:if="${#fields.hasErrors('*')}" style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
+            <h3>Por favor corrige los siguientes errores:</h3>
+            <ul>
+                <li th:each="err : ${#fields.allErrors()}" th:text="${err}"></li>
+            </ul>
+        </div>
+        
         <input type="hidden" id="idCurso" th:field="*{idCurso}" />
         
         <div>
             <label for="canal">Canal:</label>
             <input type="text" id="canal" th:field="*{canal}" />
+            <div class="text-danger" th:if="${#fields.hasErrors('canal')}" th:errors="*{canal}"></div>
         </div>
         
         <div>
             <label for="codigo">Código:</label>
             <input type="text" id="codigo" th:field="*{codigo}" />
+            <div class="text-danger" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></div>
         </div>
         
         <div>
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" th:field="*{nombre}" required />
+            <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
         </div>
         
         <div>
-            <label for="instructor">Instructor:</label>
-            <input type="text" id="instructor" th:field="*{instructor}" required />
+            <label for="idRelator">Relator:</label>
+            <select id="idRelator" th:field="*{idRelator}" required>
+                <option value="">-- Seleccione un Relator --</option>
+                <option th:each="relator : ${relatores}" th:value="${relator.idRelator}" th:text="${relator.nombres + ' ' + relator.apellidos}"></option>
+            </select>
+            <div class="text-danger" th:if="${#fields.hasErrors('idRelator')}" th:errors="*{idRelator}"></div>
         </div>
         
         <div>
             <label for="duracionHoras">Duración (Horas):</label>
             <input type="number" id="duracionHoras" th:field="*{duracionHoras}" required />
+            <div class="text-danger" th:if="${#fields.hasErrors('duracionHoras')}" th:errors="*{duracionHoras}"></div>
         </div>
         
         <div>
             <label for="categoria">Categoría:</label>
             <input type="text" id="categoria" th:field="*{categoria}" required />
+            <div class="text-danger" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></div>
         </div>
         
         <div>

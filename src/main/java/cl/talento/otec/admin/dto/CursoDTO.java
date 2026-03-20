@@ -1,24 +1,43 @@
 package cl.talento.otec.admin.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
+
 public class CursoDTO {
     private Integer idCurso;
+    
     private String canal;
+    
+    @NotBlank(message = "El código es obligatorio")
     private String codigo;
+    
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
-    private String instructor;
+    
+    @NotNull(message = "Debe seleccionar un relator")
+    private Integer idRelator;
+    
+    private String nombreRelator;
+    
+    @NotNull(message = "La duración es obligatoria")
+    @Min(value = 1, message = "La duración debe ser mayor a 0")
     private Integer duracionHoras;
+    
     private String categoria;
+    
     private Boolean activo;
 
     public CursoDTO() {
     }
 
-    public CursoDTO(Integer idCurso, String canal, String codigo, String nombre, String instructor, Integer duracionHoras, String categoria, Boolean activo) {
+    public CursoDTO(Integer idCurso, String canal, String codigo, String nombre, Integer idRelator, String nombreRelator, Integer duracionHoras, String categoria, Boolean activo) {
         this.idCurso = idCurso;
         this.canal = canal;
         this.codigo = codigo;
         this.nombre = nombre;
-        this.instructor = instructor;
+        this.idRelator = idRelator;
+        this.nombreRelator = nombreRelator;
         this.duracionHoras = duracionHoras;
         this.categoria = categoria;
         this.activo = activo;
@@ -36,8 +55,11 @@ public class CursoDTO {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public String getInstructor() { return instructor; }
-    public void setInstructor(String instructor) { this.instructor = instructor; }
+    public Integer getIdRelator() { return idRelator; }
+    public void setIdRelator(Integer idRelator) { this.idRelator = idRelator; }
+
+    public String getNombreRelator() { return nombreRelator; }
+    public void setNombreRelator(String nombreRelator) { this.nombreRelator = nombreRelator; }
 
     public Integer getDuracionHoras() { return duracionHoras; }
     public void setDuracionHoras(Integer duracionHoras) { this.duracionHoras = duracionHoras; }
