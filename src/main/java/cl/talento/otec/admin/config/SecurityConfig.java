@@ -2,7 +2,6 @@ package cl.talento.otec.admin.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,9 +15,18 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(authorize -> authorize
+				.requestMatchers("/login", "/css/**", "/js/**", "/img/**", "/api/**", "/").permitAll()
 				.requestMatchers("/cursos/**").authenticated()
+				.requestMatchers("/relatores/**").authenticated()
 				.anyRequest().permitAll())
-			.formLogin(Customizer.withDefaults());
+			.formLogin(login -> login
+				.loginPage("/login")
+				.permitAll()
+				.defaultSuccessUrl("/cursos", true)
+				.failureUrl("/login?error=true"))
+			.logout(logout -> logout
+				.logoutSuccessUrl("/login?logout=true")
+				.permitAll());
 		
 		return http.build();
 	}

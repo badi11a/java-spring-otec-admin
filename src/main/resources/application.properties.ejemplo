@@ -1,0 +1,27 @@
+# ============================================================
+# OTEC Admin - Configuración de Ejemplo
+# ============================================================
+# Este archivo es una PLANTILLA para configuración.
+# NO incluye credenciales reales y es seguro para compartir.
+# 
+# INSTRUCCIONES:
+# 1. Copia este archivo como "application.properties"
+# 2. Reemplaza los valores con tus credenciales reales
+# 3. NO subas "application.properties" al repositorio
+# ============================================================
+
+# Conexión a MariaDB
+# Cambia localhost por tu servidor si es remoto
+spring.datasource.url=jdbc:mariadb://localhost:3306/otec_admin_db
+spring.datasource.username=YOUR_DATABASE_USER
+spring.datasource.password=YOUR_DATABASE_PASSWORD
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+
+# Configuración de Hibernate
+# update: Crea/actualiza tablas automáticamente (útil en desarrollo)
+# validate: Solo valida (seguro en producción)
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# JPA Configuration
+spring.jpa.open-in-view=true

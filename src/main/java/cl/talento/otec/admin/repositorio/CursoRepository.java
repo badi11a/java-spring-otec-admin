@@ -9,4 +9,10 @@ import java.util.List;
 @Repository
 public interface CursoRepository extends JpaRepository<Curso, Integer> {
     List<Curso> findByActivoTrue();
+
+    List<Curso> findByActivoFalse();
+
+    List<Curso> findByArchivadoFalse();
+
+    List<Curso> findByArchivadoTrue();
 }

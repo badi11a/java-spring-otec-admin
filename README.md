@@ -1,20 +1,22 @@
-# Sistema de Gestión de Cursos - OTEC Admin
+﻿# Sistema de Gestión de Cursos - OTEC Admin
 
 Este proyecto es un mantenedor CRUD funcional desarrollado en **Spring Boot**, diseñado para la administración de la malla de cursos y **secciones** de un Organismo Técnico de Capacitación (OTEC), como los dictados para Talento Digital. Implementa estándares de la industria como arquitectura de capas, el uso estricto del patrón **DTO** y prácticas modernas de **Spring Security 6**.
 
 ## 🚀 Características Principales
 
-* **CRUD Básico Completo:** Capacidad para listar, crear, editar y eliminar (físicamente) cursos y secciones de la base de datos.
-* **Seguridad Base (Prueba de Concepto):** Protección de rutas (`/cursos/**`) mediante Spring Security 6 utilizando autenticación en memoria y encriptación BCrypt, sin uso de herencia obsoleta (`WebSecurityConfigurerAdapter`).
+* **Gestión de Cursos y Cohortes:** Capacidad para listar, crear, editar y aplicar borrado lógico a cursos y secciones. Soporta planificación temprana permitiendo crear cursos sin un relator asignado. Reemplaza el concepto de "canal" por un `codigoInterno` para la trazabilidad logística.
+* **Cumplimiento Normativo (SENCE - REUF):** Validación estricta en el backend que impide asignar un relator a un curso si no cuenta con la habilitación SENCE vigente para ese código de especialidad.
+* **Ciclo de Vida Dual:** Separación de estados para reflejar la realidad del negocio: Estado Académico (`activo`/`inactivo`) y Estado de Visibilidad (`archivado`/`no archivado`).
+* **Seguridad Base (Prueba de Concepto):** Protección de rutas (`/cursos/**`, `/relatores/**`) mediante Spring Security 6 utilizando autenticación en memoria y encriptación BCrypt, sin uso de herencia obsoleta (`WebSecurityConfigurerAdapter`).
 * **Separación de Responsabilidades:** Código estructurado para diferenciar claramente la lógica de acceso a datos, las reglas de negocio y la presentación web.
 
 ## 🏗️ Arquitectura del Proyecto
 
 El proyecto sigue un riguroso patrón de **3 Capas** para asegurar la escalabilidad:
 
-1. **Modelo (Entity):** Representación de la tabla `cursos` en MariaDB mediante JPA.
+1. **Modelo (Entity):** Representación de las tablas en MariaDB mediante JPA (Cursos, Relatores, Habilitaciones).
 2. **Repositorio:** Interfaz que extiende de `JpaRepository` para operaciones de persistencia automatizadas.
-3. **Servicio:** Capa de lógica de negocio donde se realiza el mapeo bidireccional de Entidades a DTOs.
+3. **Servicio:** Capa de lógica de negocio donde se realiza el mapeo bidireccional de Entidades a DTOs y se validan las reglas del OTEC.
 4. **Controlador:** Maneja las peticiones HTTP y devuelve las vistas web renderizadas.
 5. **DTO (Data Transfer Object):** Objetos de transferencia para aislar la base de datos y exponer solo los datos necesarios a la vista.
 6. **Configuración de Seguridad:** Uso de `SecurityFilterChain` para la gestión de filtros HTTP y autorización basada en componentes.
@@ -24,32 +26,28 @@ El proyecto sigue un riguroso patrón de **3 Capas** para asegurar la escalabili
 * **Java 17+**
 * **Spring Boot 3.x** (Web, Data JPA, Security)
 * **Spring Security 6**
-* **Thymeleaf** (Motor de plantillas)
+* **Thymeleaf** (Motor de plantillas renderizado en servidor)
 * **MariaDB** (Base de datos relacional)
 * **Maven** (Gestión de dependencias)
+* **Bootstrap 5** (Diseño y componentes UI)
 
-## 🗄️ Script de Base de Datos
+## 🗄️ Configuración y Despliegue Local
 
-Para iniciar el proyecto desde cero, ejecuta el siguiente script en tu gestor de base de datos (ej. HeidiSQL o DBeaver). Este script crea la base de datos y la estructura de la tabla, sin incluir datos de prueba:
+Para levantar este proyecto en tu entorno local, sigue estos pasos:
 
-```sql
--- 1. Creamos la base de datos si no existe
-CREATE DATABASE IF NOT EXISTS otec_admin_db;
+### 1. Inicialización de la Base de Datos
+El script maestro con la estructura final y datos de prueba reales está versionado en el repositorio.
+* Ejecuta el archivo `database/init_otec.sql` en tu gestor de base de datos (DBeaver, HeidiSQL, etc.).
+* Este script destruirá/creará el esquema `otec_admin_db`, configurará las tablas (`relatores`, `cursos`, `habilitaciones`) y poblará el catálogo base para validar las reglas de asignación SENCE.
 
--- 2. Le decimos a MariaDB que use esta base de datos
-USE otec_admin_db;
+### 2. Configuración de Credenciales (application.properties)
+Por motivos de seguridad, el archivo con las credenciales reales de conexión a la base de datos **no está versionado** en Git. 
+* Dirígete a la ruta `src/main/resources/`.
+* Encontrarás un archivo de plantilla llamado `application.properties.ejemplo`. Este archivo contiene el formato exacto de las propiedades que necesita el proyecto.
+* Haz una copia de ese archivo en la misma carpeta y renómbrala a `application.properties`.
+* Abre tu nuevo `application.properties` e ingresa tu `username` y `password` reales de MariaDB.
 
--- 3. Destruimos la tabla antigua si existe para evitar conflictos
-DROP TABLE IF EXISTS cursos;
-
--- 4. Creamos la tabla desde cero con la estructura definitiva
-CREATE TABLE cursos (
-    id_curso INT AUTO_INCREMENT PRIMARY KEY,
-    canal VARCHAR(50) COMMENT 'Identificador de la sección o cohorte (ej. EA-AD-1)',
-    codigo VARCHAR(50) COMMENT 'Código SENCE o interno del curso',
-    nombre VARCHAR(255) COMMENT 'Nombre oficial del curso',
-    instructor VARCHAR(100) COMMENT 'Nombre del relator asignado',
-    duracion_horas INT COMMENT 'Total de horas cronológicas',
-    categoria VARCHAR(100) COMMENT 'Área de estudio (ej. Programación, Datos e IA)',
-    activo BOOLEAN COMMENT 'Estado para el borrado lógico (1=Activo, 0=Inactivo)'
-);
+### 3. Ejecución
+* Ejecuta la clase principal de Spring Boot.
+* Asegúrate de que la propiedad `spring.jpa.hibernate.ddl-auto` esté en `none` o `validate` para evitar que Hibernate modifique la estructura creada por el script SQL.
+* Accede al sistema ingresando a `http://localhost:8080/cursos`.

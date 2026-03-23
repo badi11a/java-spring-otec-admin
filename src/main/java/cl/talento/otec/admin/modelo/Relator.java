@@ -12,10 +12,11 @@ public class Relator {
     @Column(name = "id_relator")
     private Integer idRelator;
 
+    private String rut;
     private String nombres;
     private String apellidos;
     private String email;
-    private String especialidad;
+    private String profesionTitulo;
     private Boolean activo = true;
 
     @OneToMany(mappedBy = "relator", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -38,8 +39,11 @@ public class Relator {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getEspecialidad() { return especialidad; }
-    public void setEspecialidad(String especialidad) { this.especialidad = especialidad; }
+    public String getRut() { return rut; }
+    public void setRut(String rut) { this.rut = rut; }
+
+    public String getProfesionTitulo() { return profesionTitulo; }
+    public void setProfesionTitulo(String profesionTitulo) { this.profesionTitulo = profesionTitulo; }
 
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }

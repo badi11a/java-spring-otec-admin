@@ -12,4 +12,6 @@ bin/
 *.log
 .DS_Store
 
-src/main/resources/application.properties
+# Properties (Ignorar todos excepto .ejemplo para documentación)
+src/main/resources/*.properties
+!src/main/resources/*.ejemplo

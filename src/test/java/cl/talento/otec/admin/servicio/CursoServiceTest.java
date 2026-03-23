@@ -43,19 +43,21 @@ public class CursoServiceTest {
         // Crear relator ficticio
         relatorPrueba = new Relator();
         relatorPrueba.setIdRelator(1);
+        relatorPrueba.setRut("12.345.678-9");
         relatorPrueba.setNombres("Juan");
         relatorPrueba.setApellidos("Pérez");
         relatorPrueba.setEmail("juan.perez@example.com");
-        relatorPrueba.setEspecialidad("Programación");
+        relatorPrueba.setProfesionTitulo("Ingeniero en Informática");
         relatorPrueba.setActivo(true);
 
         // Crear curso ficticio
         cursoPrueba = new Curso();
         cursoPrueba.setIdCurso(1);
-        cursoPrueba.setCanal("Online");
+        cursoPrueba.setCodigoInterno("Online");
         cursoPrueba.setCodigo("PROG-001");
         cursoPrueba.setNombre("Curso de Java Básico");
         cursoPrueba.setDuracionHoras(40);
+        cursoPrueba.setCodigoSence("SENCE-100");
         cursoPrueba.setCategoria("Programación");
         cursoPrueba.setActivo(true);
         cursoPrueba.setRelator(relatorPrueba);
@@ -63,12 +65,13 @@ public class CursoServiceTest {
         // Crear DTO ficticio
         cursoDTOPrueba = new CursoDTO();
         cursoDTOPrueba.setIdCurso(1);
-        cursoDTOPrueba.setCanal("Online");
+        cursoDTOPrueba.setCodigoInterno("Online");
         cursoDTOPrueba.setCodigo("PROG-001");
         cursoDTOPrueba.setNombre("Curso de Java Básico");
         cursoDTOPrueba.setIdRelator(1);
         cursoDTOPrueba.setNombreRelator("Juan Pérez");
         cursoDTOPrueba.setDuracionHoras(40);
+        cursoDTOPrueba.setCodigoSence("SENCE-100");
         cursoDTOPrueba.setCategoria("Programación");
         cursoDTOPrueba.setActivo(true);
     }
@@ -102,11 +105,12 @@ public class CursoServiceTest {
         // Arrange - Crear un DTO sin ID (nuevo curso)
         CursoDTO cursoNuevo = new CursoDTO();
         cursoNuevo.setIdCurso(null); // Sin ID = crear nuevo
-        cursoNuevo.setCanal("Online");
+        cursoNuevo.setCodigoInterno("Online");
         cursoNuevo.setCodigo("PROG-001");
         cursoNuevo.setNombre("Curso de Java Básico");
         cursoNuevo.setIdRelator(1);
         cursoNuevo.setDuracionHoras(40);
+        cursoNuevo.setCodigoSence("SENCE-100");
         cursoNuevo.setCategoria("Programación");
         cursoNuevo.setActivo(true);
 
@@ -127,11 +131,12 @@ public class CursoServiceTest {
         // Arrange - Actualizar un curso existente
         CursoDTO cursoExistente = new CursoDTO();
         cursoExistente.setIdCurso(1); // Con ID = actualizar
-        cursoExistente.setCanal("Presencial");
+        cursoExistente.setCodigoInterno("Presencial");
         cursoExistente.setCodigo("PROG-001-UPD");
         cursoExistente.setNombre("Curso Java Avanzado");
         cursoExistente.setIdRelator(1);
         cursoExistente.setDuracionHoras(60);
+        cursoExistente.setCodigoSence("SENCE-100");
         cursoExistente.setCategoria("Programación");
         cursoExistente.setActivo(true);
 
@@ -155,6 +160,7 @@ public class CursoServiceTest {
         cursoSinRelator.setIdCurso(null);
         cursoSinRelator.setCodigo("PROG-002");
         cursoSinRelator.setNombre("Curso sin instructor");
+        cursoSinRelator.setCodigoSence("SENCE-200");
         cursoSinRelator.setDuracionHoras(20);
         cursoSinRelator.setIdRelator(null); // Sin relator
 
@@ -226,6 +232,99 @@ public class CursoServiceTest {
         assertNull(resultado, "El DTO debe ser null cuando el curso no existe");
         
         verify(cursoRepository, times(1)).findById(cursoId);
+    }
+
+    @Test
+    void testListarInactivos() {
+        // Arrange
+        Curso cursoInactivo = new Curso();
+        cursoInactivo.setIdCurso(2);
+        cursoInactivo.setCodigoInterno("Online");
+        cursoInactivo.setCodigo("PROG-INACTIVO");
+        cursoInactivo.setNombre("Curso Inactivo");
+        cursoInactivo.setDuracionHoras(30);
+        cursoInactivo.setCodigoSence("SENCE-999");
+        cursoInactivo.setCategoria("Archivos");
+        cursoInactivo.setActivo(false);
+        cursoInactivo.setRelator(relatorPrueba);
+
+        List<Curso> cursosInactivos = new ArrayList<>();
+        cursosInactivos.add(cursoInactivo);
+        
+        when(cursoRepository.findByActivoFalse()).thenReturn(cursosInactivos);
+
+        // Act
+        List<CursoDTO> resultado = cursoService.listarInactivos();
+
+        // Assert
+        assertNotNull(resultado, "La lista de inactivos no debe ser null");
+        assertEquals(1, resultado.size(), "Debe contener 1 curso inactivo");
+        
+        CursoDTO cursoResultado = resultado.get(0);
+        assertEquals("PROG-INACTIVO", cursoResultado.getCodigo(), "El código debe coincidir");
+        assertEquals("Curso Inactivo", cursoResultado.getNombre(), "El nombre debe coincidir");
+        assertFalse(cursoResultado.getActivo(), "El curso debe estar inactivo");
+        
+        verify(cursoRepository, times(1)).findByActivoFalse();
+    }
+
+    @Test
+    void testListarInactivosVacio() {
+        // Arrange
+        when(cursoRepository.findByActivoFalse()).thenReturn(new ArrayList<>());
+
+        // Act
+        List<CursoDTO> resultado = cursoService.listarInactivos();
+
+        // Assert
+        assertNotNull(resultado, "La lista de inactivos no debe ser null");
+        assertEquals(0, resultado.size(), "La lista debe estar vacía");
+        
+        verify(cursoRepository, times(1)).findByActivoFalse();
+    }
+
+    @Test
+    void testRestaurarCurso() {
+        // Arrange
+        Integer cursoId = 1;
+        Curso cursoInactivo = new Curso();
+        cursoInactivo.setIdCurso(cursoId);
+        cursoInactivo.setCodigoInterno("Online");
+        cursoInactivo.setCodigo("PROG-001");
+        cursoInactivo.setNombre("Curso de Java Básico");
+        cursoInactivo.setDuracionHoras(40);
+        cursoInactivo.setCodigoSence("SENCE-100");
+        cursoInactivo.setCategoria("Programación");
+        cursoInactivo.setActivo(false);
+        cursoInactivo.setRelator(relatorPrueba);
+
+        when(cursoRepository.findById(cursoId)).thenReturn(Optional.of(cursoInactivo));
+        when(cursoRepository.save(any(Curso.class))).thenReturn(cursoInactivo);
+
+        assertFalse(cursoInactivo.getActivo(), "El curso debe estar inactivo antes de restaurar");
+
+        // Act
+        cursoService.restaurar(cursoId);
+
+        // Assert
+        assertTrue(cursoInactivo.getActivo(), "El curso debe estar activo después de restaurar");
+        
+        verify(cursoRepository, times(1)).findById(cursoId);
+        verify(cursoRepository, times(1)).save(any(Curso.class));
+    }
+
+    @Test
+    void testRestaurarCursoNoExistente() {
+        // Arrange
+        Integer cursoId = 999;
+        when(cursoRepository.findById(cursoId)).thenReturn(Optional.empty());
+
+        // Act
+        cursoService.restaurar(cursoId);
+
+        // Assert
+        verify(cursoRepository, times(1)).findById(cursoId);
+        verify(cursoRepository, never()).save(any(Curso.class));
     }
 
 }

@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 
 import cl.talento.otec.admin.dto.CursoDTO;
 import cl.talento.otec.admin.servicio.CursoService;
+import cl.talento.otec.admin.servicio.RelatorService;
 import cl.talento.otec.admin.repositorio.RelatorRepository;
 
 @Controller
@@ -19,17 +20,20 @@ import cl.talento.otec.admin.repositorio.RelatorRepository;
 public class CursoController {
 
     private final CursoService cursoService;
+    private final RelatorService relatorService;
     private final RelatorRepository relatorRepository;
 
-    public CursoController(CursoService cursoService, RelatorRepository relatorRepository) {
+    public CursoController(CursoService cursoService, RelatorService relatorService,
+            RelatorRepository relatorRepository) {
         this.cursoService = cursoService;
+        this.relatorService = relatorService;
         this.relatorRepository = relatorRepository;
     }
 
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("cursos", cursoService.obtenerTodosCursos());
-        return "cursos"; 
+        return "cursos";
     }
 
     @GetMapping("/nuevo")
@@ -64,7 +68,8 @@ public class CursoController {
             return "redirect:/cursos";
         }
         model.addAttribute("curso", curso);
-        model.addAttribute("relatores", relatorRepository.findByActivoTrue());
+        // Filtrar relatores habilitados para el código SENCE del curso
+        model.addAttribute("relatores", relatorService.buscarHabilitadosPorCodigoSence(curso.getCodigoSence()));
         return "nuevo-curso";
     }
 
@@ -73,5 +78,16 @@ public class CursoController {
         cursoService.eliminarCurso(id);
         return "redirect:/cursos";
     }
-}
 
+    @GetMapping("/inactivos")
+    public String listarInactivos(Model model) {
+        model.addAttribute("cursos", cursoService.listarInactivos());
+        return "archivo-cursos";
+    }
+
+    @GetMapping("/restaurar/{id}")
+    public String restaurarCurso(@PathVariable("id") Integer id) {
+        cursoService.restaurar(id);
+        return "redirect:/cursos/inactivos";
+    }
+}

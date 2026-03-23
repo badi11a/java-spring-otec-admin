@@ -1,75 +1,88 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Crear Nuevo Curso - OTEC</title>
-</head>
-<body>
-    <h1>Crear Nuevo Curso</h1>
-    
-    <div th:if="${error}" style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
-        <h3>Error:</h3>
-        <p th:text="${error}"></p>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/master :: layout(~{::title}, ~{::section})}">
+<title>Nuevo Curso - OTEC Admin</title>
+<section>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 th:text="${curso.idCurso != null ? 'Editar Curso' : 'Crear Nuevo Curso'}">Crear Nuevo Curso</h1>
+        </div>
     </div>
-    
-    <form th:action="@{/cursos}" th:object="${curso}" method="POST">
-        <div th:if="${#fields.hasErrors('*')}" style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
-            <h3>Por favor corrige los siguientes errores:</h3>
-            <ul>
-                <li th:each="err : ${#fields.allErrors()}" th:text="${err}"></li>
-            </ul>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error:</strong>
+                <p th:text="${error}" class="mb-0"></p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <form th:action="@{/cursos}" th:object="${curso}" method="POST" class="needs-validation" novalidate="novalidate">
+                <input type="hidden" id="idCurso" th:field="*{idCurso}" />
+
+                <div class="mb-3">
+                    <label for="codigo" class="form-label">Código <span class="text-danger">*</span></label>
+                    <input type="text" id="codigo" th:field="*{codigo}" class="form-control" th:classappend="${#fields.hasErrors('codigo') ? 'is-invalid' : ''}" required="required" />
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                    <input type="text" id="nombre" th:field="*{nombre}" class="form-control" th:classappend="${#fields.hasErrors('nombre') ? 'is-invalid' : ''}" required="required" />
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="codigoInterno" class="form-label">Código Interno <span class="text-danger">*</span></label>
+                    <input type="text" id="codigoInterno" th:field="*{codigoInterno}" class="form-control" th:classappend="${#fields.hasErrors('codigoInterno') ? 'is-invalid' : ''}" required="required" />
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('codigoInterno')}" th:errors="*{codigoInterno}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="idRelator" class="form-label">Relator</label>
+                    <select id="idRelator" th:field="*{idRelator}" class="form-select" th:classappend="${#fields.hasErrors('idRelator') ? 'is-invalid' : ''}">
+                        <option value="">-- Seleccione un Relator --</option>
+                        <option th:each="relator : ${relatores}" th:value="${relator.idRelator}" th:text="${relator.nombres + ' ' + relator.apellidos}"></option>
+                    </select>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('idRelator')}" th:errors="*{idRelator}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="duracionHoras" class="form-label">Duración (Horas) <span class="text-danger">*</span></label>
+                    <input type="number" id="duracionHoras" th:field="*{duracionHoras}" class="form-control" th:classappend="${#fields.hasErrors('duracionHoras') ? 'is-invalid' : ''}" min="1" required="required" />
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('duracionHoras')}" th:errors="*{duracionHoras}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="codigoSence" class="form-label">Código SENCE <span class="text-danger">*</span></label>
+                    <input type="text" id="codigoSence" th:field="*{codigoSence}" class="form-control" th:classappend="${#fields.hasErrors('codigoSence') ? 'is-invalid' : ''}" required="required" />
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('codigoSence')}" th:errors="*{codigoSence}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="categoria" class="form-label">Categoría</label>
+                    <input type="text" id="categoria" th:field="*{categoria}" class="form-control" th:classappend="${#fields.hasErrors('categoria') ? 'is-invalid' : ''}" />
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input type="checkbox" id="activo" th:field="*{activo}" class="form-check-input" />
+                        <label class="form-check-label" for="activo">
+                            Curso Activo
+                        </label>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Guardar Curso
+                    </button>
+                    <a th:href="@{/cursos}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
         </div>
-        
-        <input type="hidden" id="idCurso" th:field="*{idCurso}" />
-        
-        <div>
-            <label for="canal">Canal:</label>
-            <input type="text" id="canal" th:field="*{canal}" />
-            <div class="text-danger" th:if="${#fields.hasErrors('canal')}" th:errors="*{canal}"></div>
-        </div>
-        
-        <div>
-            <label for="codigo">Código:</label>
-            <input type="text" id="codigo" th:field="*{codigo}" />
-            <div class="text-danger" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></div>
-        </div>
-        
-        <div>
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" th:field="*{nombre}" required />
-            <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
-        </div>
-        
-        <div>
-            <label for="idRelator">Relator:</label>
-            <select id="idRelator" th:field="*{idRelator}" required>
-                <option value="">-- Seleccione un Relator --</option>
-                <option th:each="relator : ${relatores}" th:value="${relator.idRelator}" th:text="${relator.nombres + ' ' + relator.apellidos}"></option>
-            </select>
-            <div class="text-danger" th:if="${#fields.hasErrors('idRelator')}" th:errors="*{idRelator}"></div>
-        </div>
-        
-        <div>
-            <label for="duracionHoras">Duración (Horas):</label>
-            <input type="number" id="duracionHoras" th:field="*{duracionHoras}" required />
-            <div class="text-danger" th:if="${#fields.hasErrors('duracionHoras')}" th:errors="*{duracionHoras}"></div>
-        </div>
-        
-        <div>
-            <label for="categoria">Categoría:</label>
-            <input type="text" id="categoria" th:field="*{categoria}" required />
-            <div class="text-danger" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></div>
-        </div>
-        
-        <div>
-            <label for="activo">Activo:</label>
-            <input type="checkbox" id="activo" th:field="*{activo}" />
-        </div>
-        
-        <div>
-            <button type="submit">Guardar Curso</button>
-            <a th:href="@{/cursos}">Cancelar</a>
-        </div>
-    </form>
-</body>
+    </div>
+</section>
 </html>

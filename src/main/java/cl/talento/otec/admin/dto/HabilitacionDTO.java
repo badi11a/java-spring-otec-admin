@@ -1,45 +1,46 @@
-package cl.talento.otec.admin.modelo;
+package cl.talento.otec.admin.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "habilitaciones")
-public class Habilitacion {
+public class HabilitacionDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_habilitacion")
     private Integer idHabilitacion;
+    private Integer idRelator;
 
-    @Column(name = "area_curso")
+    @NotBlank(message = "El área del curso es obligatoria")
     private String areaCurso;
 
-    @Column(name = "codigo_especialidad_sence")
     @NotBlank(message = "Código de especialidad SENCE es obligatorio")
     private String codigoEspecialidadSence;
 
-    @Column(name = "estado_reuf")
     @NotBlank(message = "Estado REUF es obligatorio")
     private String estadoReuf;
 
-    @Column(name = "fecha_vencimiento_reuf")
     @NotNull(message = "Fecha de vencimiento REUF es obligatoria")
     private LocalDate fechaVencimientoReuf;
 
     private String estado;
-    private Boolean activo = true;
 
-    @ManyToOne
-    @JoinColumn(name = "id_relator")
-    private Relator relator;
+    public HabilitacionDTO() {}
 
-    public Habilitacion() {}
+    public HabilitacionDTO(Integer idHabilitacion, Integer idRelator, String areaCurso, 
+                          String codigoEspecialidadSence, String estadoReuf, LocalDate fechaVencimientoReuf, String estado) {
+        this.idHabilitacion = idHabilitacion;
+        this.idRelator = idRelator;
+        this.areaCurso = areaCurso;
+        this.codigoEspecialidadSence = codigoEspecialidadSence;
+        this.estadoReuf = estadoReuf;
+        this.fechaVencimientoReuf = fechaVencimientoReuf;
+        this.estado = estado;
+    }
 
     public Integer getIdHabilitacion() { return idHabilitacion; }
     public void setIdHabilitacion(Integer idHabilitacion) { this.idHabilitacion = idHabilitacion; }
+
+    public Integer getIdRelator() { return idRelator; }
+    public void setIdRelator(Integer idRelator) { this.idRelator = idRelator; }
 
     public String getAreaCurso() { return areaCurso; }
     public void setAreaCurso(String areaCurso) { this.areaCurso = areaCurso; }
@@ -55,10 +56,4 @@ public class Habilitacion {
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
-
-    public Boolean getActivo() { return activo; }
-    public void setActivo(Boolean activo) { this.activo = activo; }
-
-    public Relator getRelator() { return relator; }
-    public void setRelator(Relator relator) { this.relator = relator; }
 }

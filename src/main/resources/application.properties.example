@@ -1,4 +1,0 @@
-spring.datasource.url=jdbc:mariadb://localhost:3306/otec_admin_db
-spring.datasource.username=TU_USUARIO_AQUI
-spring.datasource.password=TU_PASSWORD_AQUI
-spring.jpa.hibernate.ddl-auto=update

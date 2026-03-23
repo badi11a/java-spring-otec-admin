@@ -23,19 +23,19 @@ public class CursoService {
     }
 
     public List<CursoDTO> obtenerTodosCursos() {
-        return cursoRepository.findByActivoTrue().stream()
+        return cursoRepository.findByArchivadoFalse().stream()
                 .map(this::mapCursoToDTO)
                 .toList();
     }
-    
+
     private CursoDTO mapCursoToDTO(Curso curso) {
         if (curso == null) {
             return null;
         }
-        
+
         String nombreRelator = "Sin Relator Asignado";
         Integer idRelator = null;
-        
+
         try {
             Relator relator = curso.getRelator();
             if (relator != null) {
@@ -51,27 +51,28 @@ public class CursoService {
             System.err.println("Error al mapear relator: " + e.getMessage());
             nombreRelator = "Sin Relator Asignado";
         }
-        
+
         return new CursoDTO(
                 curso.getIdCurso(),
-                curso.getCanal(),
+                curso.getCodigoInterno(),
                 curso.getCodigo(),
                 curso.getNombre(),
                 idRelator,
                 nombreRelator,
                 curso.getDuracionHoras(),
+                curso.getCodigoSence(),
                 curso.getCategoria(),
-                curso.getActivo()
-        );
+                curso.getActivo(),
+                curso.getArchivado());
     }
 
     public void guardarCurso(CursoDTO cursoDTO) {
         if (cursoDTO == null) {
             throw new IllegalArgumentException("CursoDTO no puede ser nulo");
         }
-        
+
         Curso curso;
-        
+
         if (cursoDTO.getIdCurso() != null) {
             Optional<Curso> existente = cursoRepository.findById(cursoDTO.getIdCurso());
             if (!existente.isPresent()) {
@@ -81,14 +82,16 @@ public class CursoService {
         } else {
             curso = new Curso();
         }
-        
-        curso.setCanal(cursoDTO.getCanal() != null ? cursoDTO.getCanal() : "");
+
+        curso.setCodigoInterno(cursoDTO.getCodigoInterno() != null ? cursoDTO.getCodigoInterno() : "");
         curso.setCodigo(cursoDTO.getCodigo());
         curso.setNombre(cursoDTO.getNombre());
         curso.setDuracionHoras(cursoDTO.getDuracionHoras());
+        curso.setCodigoSence(cursoDTO.getCodigoSence());
         curso.setCategoria(cursoDTO.getCategoria() != null ? cursoDTO.getCategoria() : "");
         curso.setActivo(cursoDTO.getActivo() != null ? cursoDTO.getActivo() : true);
-        
+        curso.setArchivado(cursoDTO.getArchivado() != null ? cursoDTO.getArchivado() : false);
+
         if (cursoDTO.getIdRelator() != null) {
             Optional<Relator> relator = relatorRepository.findById(cursoDTO.getIdRelator());
             if (relator.isPresent()) {
@@ -99,7 +102,7 @@ public class CursoService {
         } else {
             curso.setRelator(null);
         }
-        
+
         cursoRepository.save(curso);
     }
 
@@ -117,9 +120,27 @@ public class CursoService {
             if (curso.isPresent()) {
                 Curso cursoAEliminar = curso.get();
                 cursoAEliminar.setActivo(false);
+                cursoAEliminar.setArchivado(true);
                 cursoRepository.save(cursoAEliminar);
             }
         }
     }
-}
 
+    public List<CursoDTO> listarInactivos() {
+        return cursoRepository.findByArchivadoTrue().stream()
+                .map(this::mapCursoToDTO)
+                .toList();
+    }
+
+    public void restaurar(Integer id) {
+        if (id != null) {
+            Optional<Curso> curso = cursoRepository.findById(id);
+            if (curso.isPresent()) {
+                Curso cursoARestaurar = curso.get();
+                cursoARestaurar.setArchivado(false);
+                cursoARestaurar.setActivo(false);
+                cursoRepository.save(cursoARestaurar);
+            }
+        }
+    }
+}
